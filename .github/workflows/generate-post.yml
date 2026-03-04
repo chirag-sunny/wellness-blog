@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,11 +20,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install openai
+        run: pip install google-generativeai
 
       - name: Generate new article
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python3 generate_post.py
 
       - name: Commit new article
