@@ -1,28 +1,33 @@
 import os
 import json
-import openai
+import google.generativeai as genai
 from datetime import date
 
-client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {
-            "role": "user",
-            "content": (
-                "Write a short, informative health and wellness article "
-                "(200-300 words). Include a catchy title and a brief summary. "
-                "Return JSON with keys: title, summary, content, date."
-            )
-        }
-    ],
-    response_format={"type": "json_object"}
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+prompt = (
+    "Write a short, informative health and wellness article (200-300 words). "
+    "Include a catchy title and a brief summary. "
+    "Return only valid JSON with exactly these keys: title, summary, content, date. "
+    "Do not include any markdown formatting or code fences."
 )
 
-article = json.loads(response.choices[0].message.content)
+response = model.generate_content(prompt)
+raw = response.text.strip()
+
+# Strip markdown code fences if present
+if raw.startswith("```"):
+    raw = raw.split("```")[1]
+    if raw.startswith("json"):
+        raw = raw[4:]
+    raw = raw.strip()
+
+article = json.loads(raw)
 article["date"] = str(date.today())
 
+# Load existing posts and prepend the new one
 posts_file = "posts.json"
 try:
     with open(posts_file, "r") as f:
