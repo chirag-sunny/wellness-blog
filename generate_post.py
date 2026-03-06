@@ -5,7 +5,7 @@ from datetime import date
 
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
 prompt = (
     "Write a short, informative health and wellness article (200-300 words). "
